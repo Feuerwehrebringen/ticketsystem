@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ticketsystem - Feuerwehr Ebringen</title>
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    body { background-color: #f4f6f9; padding: 20px 10px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    .app-wrapper { max-width: 850px; margin: auto; }
+    
+    /* Header Bereich */
+    .header-card { background: white; border-radius: 16px; padding: 25px 20px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 20px; border-top: 6px solid #e30613; }
+    .header-card img { max-height: 85px; margin-bottom: 15px; }
+    .header-title { font-weight: 800; color: #2c3e50; margin: 0; font-size: 1.4rem; letter-spacing: -0.5px; }
+    
+    /* Sektions-Karten */
+    .section-card { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 20px; }
+    .section-title { font-size: 0.85rem; font-weight: 700; color: #e30613; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+    
+    /* Eingabefelder mit Icons */
+    .input-group-text { background-color: #f8f9fa; border-right: none; color: #6c757d; }
+    .form-control { border-left: none; padding-left: 0; box-shadow: none !important; border-color: #dee2e6; }
+    
+    /* Dropdown spezifisch für zentrierten Text */
+    .form-select { border-left: none; box-shadow: none !important; border-color: #dee2e6; text-align: center; text-align-last: center; padding-left: 0; }
+    .form-select option { text-align: center; }
+    
+    .form-control:focus, .form-select:focus { border-color: #dee2e6; }
+    .input-group:focus-within { box-shadow: 0 0 0 0.25rem rgba(227, 6, 19, 0.15); border-radius: 0.375rem; }
+    .input-group:focus-within .input-group-text, .input-group:focus-within .form-control, .input-group:focus-within .form-select { border-color: #e30613; }
+    
+    /* Absende-Button */
+    .btn-fire { background: linear-gradient(135deg, #e30613 0%, #b2050f 100%); color: white; border: none; font-weight: bold; padding: 16px; border-radius: 12px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(227, 6, 19, 0.3); }
+    .btn-fire:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(227, 6, 19, 0.4); color: white; }
+    .btn-fire:disabled { background: #ccc; box-shadow: none; transform: none; }
+    
+    /* Status-Nachricht */
+    .status-msg { display: none; padding: 15px; border-radius: 12px; font-weight: 600; text-align: center; margin-top: 20px; animation: fadeIn 0.5s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <div class="app-wrapper">
+    
+    <!-- Kopfzeile -->
+    <div class="header-card">
+      <img src="https://lh3.googleusercontent.com/d/13vztxml1yQVTaQ2ikCtaFVhf7GRnlXE5" alt="Logo">
+      <h1 class="header-title">Mängel- & Ticketmeldung</h1>
+      <p class="text-muted small mb-0 mt-1">Feuerwehr Ebringen</p>
+    </div>
+
+    <form id="ticketForm">
+      
+      <!-- Abschnitt 1: Melder -->
+      <div class="section-card">
+        <div class="section-title"><i class="bi bi-person-badge"></i> Absender</div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input type="text" name="name" class="form-control" placeholder="Name *" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+              <input type="email" name="email" class="form-control" placeholder="E-Mail (optional)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Abschnitt 2: Kategorisierung -->
+      <div class="section-card">
+        <div class="section-title"><i class="bi bi-tags"></i> Einordnung</div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="small text-muted mb-1 fw-semibold">Fachbereich *</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-diagram-3"></i></span>
+              <select name="bereich" class="form-select">
+                <option>Allgemein / Technik</option>
+                <option>Fahrzeug</option>
+                <option>Geräte</option>
+                <option>Atemschutz</option>
+                <option>PSA / Dienstkleidung</option>
+                <option>Gebäude</option>
+                <option>Funk / IT</option>
+                <option>Alamos / aPager</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="small text-muted mb-1 fw-semibold">Dringlichkeit *</label>
+            <div class="input-group" id="urgencyGroup">
+              <span class="input-group-text" id="urgencyIcon"><i class="bi bi-thermometer-half"></i></span>
+              <select name="dringlichkeit" id="urgency" class="form-select" onchange="checkUrgency(this)">
+                <option value="Info">Info</option>
+                <option value="Normal" selected>Normal</option>
+                <option value="Nutzungseinschränkung">Eingeschränkt bereit</option>
+                <option value="Gefahr in Verzug">⚠️ GEFAHR IN VERZUG</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Abschnitt 3: Details -->
+      <div class="section-card">
+        <div class="section-title"><i class="bi bi-card-text"></i> Inhalt</div>
+        
+        <div class="input-group mb-3">
+          <span class="input-group-text"><i class="bi bi-chat-left-short"></i></span>
+          <input type="text" name="betreff" class="form-control" placeholder="Betreff *" required>
+        </div>
+        
+        <div class="input-group mb-3">
+          <span class="input-group-text align-items-start pt-2"><i class="bi bi-text-paragraph"></i></span>
+          <textarea name="beschreibung" class="form-control" rows="4" placeholder="Beschreibung *" required></textarea>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="small text-muted mb-1 fw-semibold">Foto anhängen (optional)</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-camera"></i></span>
+              <input type="file" id="photo" class="form-control" accept="image/*" capture="environment">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" id="submitBtn" onclick="submitData()" class="btn btn-fire w-100">
+        <i class="bi bi-send-fill me-2"></i> Ticket absenden
+      </button>
+
+    </form>
+    
+    <div id="statusOutput" class="status-msg"></div>
+    
+  </div>
+
+  <script>
+    // WICHTIG: Ersetze dies durch die URL, die du von Google Scripts (Neue Bereitstellung) erhalten hast!
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7L34Zz0yRgxucqtVvRb2MzJQqeThke9zT2BN6Ouy9dtTJupd08HJo8e8pl1PV62sx/exec"; 
+
+    function checkUrgency(select) {
+      const icon = document.getElementById('urgencyIcon');
+      
+      if(select.value === "Gefahr in Verzug") {
+        select.style.backgroundColor = "#fff0f0";
+        select.style.color = "#d32f2f";
+        select.style.fontWeight = "bold";
+        icon.innerHTML = '<i class="bi bi-exclamation-triangle-fill text-danger"></i>';
+        icon.style.backgroundColor = "#fff0f0";
+      } else {
+        select.style.backgroundColor = "";
+        select.style.color = "";
+        select.style.fontWeight = "";
+        icon.innerHTML = '<i class="bi bi-thermometer-half"></i>';
+        icon.style.backgroundColor = "";
+      }
+    }
+
+    function submitData() {
+      const form = document.getElementById('ticketForm');
+      const btn = document.getElementById('submitBtn');
+      const output = document.getElementById('statusOutput');
+
+      if(!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Sende Daten...';
+      output.style.display = "none";
+
+      const fileInput = document.getElementById('photo');
+      const file = fileInput.files[0];
+
+      if(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const fileData = {
+            data: e.target.result.split(',')[1],
+            mimeType: file.type,
+            fileName: file.name
+          };
+          sendToGas(form, fileData);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        sendToGas(form, null);
+      }
+    }
+
+    function sendToGas(form, fileData) {
+      const formData = {
+        name: form.name.value,
+        email: form.email.value,
+        bereich: form.bereich.value,
+        dringlichkeit: form.dringlichkeit.value,
+        betreff: form.betreff.value,
+        beschreibung: form.beschreibung.value,
+        myFile: fileData
+      };
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "newTicket", data: formData }),
+        headers: { "Content-Type": "text/plain;charset=utf-8" }
+      })
+      .then(response => response.json())
+      .then(result => {
+        const output = document.getElementById('statusOutput');
+        output.style.display = "block";
+        output.className = "status-msg alert alert-success shadow-sm";
+        output.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>' + result.message;
+        form.reset();
+        checkUrgency(document.getElementById('urgency'));
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-send-fill me-2"></i> Ticket absenden';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      })
+      .catch(error => {
+        alert("Ein Fehler ist aufgetreten: " + error);
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-send-fill me-2"></i> Ticket absenden';
+      });
+    }
+  </script>
+</body>
+</html>
