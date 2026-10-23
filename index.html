@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Ticketsystem – FF Ebringen</title>
+<link rel="icon" href="logo.png">
+<style>
+  :root{--red:#b3141b;--red-d:#8a0f15;--bg:#f4f4f5;--card:#fff;--tx:#1d1d1f;--mut:#6b6b70;--bd:#dcdce0;--ok:#1a7f37}
+  @media (prefers-color-scheme:dark){:root{--bg:#18181a;--card:#242427;--tx:#f0f0f2;--mut:#a0a0a8;--bd:#3a3a3f}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+  .wrap{max-width:680px;margin:0 auto;padding:0 16px}
+  header{background:linear-gradient(180deg,#c8161e 0%,#9c1017 100%);color:#fff;padding:18px 0 22px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+  .hin{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .logo{background:#fff;border-radius:12px;padding:8px 16px;box-shadow:0 2px 8px rgba(0,0,0,.3);max-width:100%}
+  .logo img{display:block;height:56px;width:auto;max-width:100%}
+  .ttl h1{margin:0;font-size:24px;line-height:1.15}
+  .ttl .sub{margin-top:3px;font-size:13px;opacity:.9}
+  main{max-width:680px;margin:0 auto;padding:18px 16px 16px}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:14px}
+  label{display:block;font-weight:600;margin:14px 0 6px}
+  #form{border-top:4px solid var(--red)}
+  #form>label:first-of-type{margin-top:0}
+  .opt{font-weight:400;color:var(--mut);font-size:13px}
+  input[type=text],input[type=email],select,textarea{width:100%;padding:12px;font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:8px}
+  textarea{min-height:130px;resize:vertical}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--red);border-color:var(--red)}
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg input{position:absolute;opacity:0;pointer-events:none}
+  .seg label{margin:0;flex:1 1 22%;text-align:center;padding:10px 6px;border:1px solid var(--bd);border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;background:var(--card)}
+  .seg input:checked+label{background:var(--red);color:#fff;border-color:var(--red)}
+  .hint{font-size:13px;color:var(--mut);margin-top:6px}
+  .btn{display:block;width:100%;padding:14px;border:0;border-radius:10px;background:linear-gradient(180deg,#c8161e,#a0121a);box-shadow:0 2px 6px rgba(160,18,26,.35);color:#fff;font-weight:600;font-size:17px;font-family:inherit;cursor:pointer}
+  .btn:disabled{opacity:.6}
+  .btn.sec{background:transparent;box-shadow:none;color:var(--red);border:1px solid var(--red);margin-top:10px}
+  .hp{position:absolute;left:-9999px;height:0;overflow:hidden}
+  .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .th{position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:1px solid var(--bd)}
+  .th img{width:100%;height:100%;object-fit:cover}
+  .th button{position:absolute;top:2px;right:2px;width:22px;height:22px;border:0;border-radius:11px;background:rgba(0,0,0,.65);color:#fff;font-size:14px;line-height:22px;padding:0;cursor:pointer}
+  .addph{display:inline-block;padding:10px 14px;border:1px dashed var(--red);color:var(--red);border-radius:8px;font-weight:600;cursor:pointer}
+  .err{background:#fdecea;color:#8a1111;border:1px solid #f3b5b0;border-radius:8px;padding:10px 12px;margin-bottom:12px;display:none}
+  .done{text-align:center;padding:28px 16px}
+  .done .nr{font-size:28px;font-weight:700;color:var(--red);margin:8px 0}
+  .done .ok{font-size:44px}
+  footer{max-width:680px;margin:0 auto;padding:0 16px 24px;text-align:center;font-size:13px}
+  footer a{color:var(--mut)}
+  .tabs{display:flex;gap:8px;margin-bottom:14px}
+  .tab{flex:1;padding:12px 8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font-weight:600;font-size:15px;font-family:inherit;cursor:pointer}
+  .tab.on{background:var(--red);border-color:var(--red);color:#fff}
+  .tab .n{display:inline-block;min-width:22px;padding:1px 7px;margin-left:4px;border-radius:99px;background:rgba(0,0,0,.12);font-size:13px}
+  .tab.on .n{background:rgba(255,255,255,.28)}
+  .lf{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+  .lf select{flex:1}
+  .tk{background:var(--card);border:1px solid var(--bd);border-left:4px solid var(--red);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+  .tk.closed{opacity:.65;border-left-color:#8a8a90}
+  .tk .r1{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+  .tk .nr{font-weight:700;color:var(--red)}
+  .tk .tt{font-weight:600;margin:2px 0}
+  .tk .mt{color:var(--mut);font-size:13px}
+  .bd{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .b{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;border:1px solid var(--bd)}
+  .b.pd{background:#b3141b;color:#fff;border-color:#b3141b}
+  .b.p2{background:#f59e0b;color:#1d1d1f;border-color:#f59e0b}
+  .b.st{background:var(--bg)}
+  .lsec{margin:16px 2px 8px;font-weight:700;color:var(--mut);font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+  .dupe{background:#fff7e0;color:#4a3a00;border:1px solid #f0d58a;border-radius:10px;padding:10px 12px;margin:12px 0 0}
+  @media (prefers-color-scheme:dark){.dupe{background:#3a3217;color:#f3e3b0;border-color:#6b5a1f}}
+  .dupe b{display:block;margin-bottom:6px}
+  .dupe .tk{margin-bottom:6px}
+  .empty{text-align:center;color:var(--mut);padding:18px 8px}
+  .lnk{background:none;border:0;color:var(--red);font-weight:600;font-family:inherit;font-size:inherit;padding:0;cursor:pointer;text-decoration:underline}
+  .mtw{margin-top:8px;font-size:14px}
+  .mtf input{width:100%;padding:9px;margin-bottom:6px;font-size:14px}
+  .mta{display:flex;gap:8px;flex-wrap:wrap}
+  .mbtn{padding:9px 14px;border-radius:8px;border:1px solid var(--red);background:var(--red);color:#fff;font-weight:600;font-family:inherit;font-size:14px;cursor:pointer}
+  .mbtn.sec{background:transparent;color:var(--red)}
+  .mbtn:disabled{opacity:.6}
+  .mte{color:#b3141b;font-size:13px;margin-top:6px}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<header><div class="wrap hin">
+  <div class="logo"><img src="logo.png" alt="Freiwillige Feuerwehr Ebringen"></div>
+  <div class="ttl"><h1>Ticketsystem</h1><div class="sub">Mängel, Gerätehaus, Material und Technik</div></div>
+</div></header>
+<main>
+  <div id="loading" class="card">Lade …</div>
+
+  <div id="tabs" class="tabs hidden">
+    <button type="button" class="tab" id="tabForm">Neue Meldung</button>
+    <button type="button" class="tab" id="tabList">Offene Meldungen <span class="n" id="cnt">0</span></button>
+  </div>
+
+  <div id="listView" class="hidden">
+    <div class="lf"><select id="lfKat" aria-label="Kategorie filtern"></select></div>
+    <div id="listOpen"></div>
+    <div id="listClosedWrap" class="hidden"><div class="lsec">Kürzlich erledigt</div><div id="listClosed"></div></div>
+    <div class="empty">Nichts Passendes dabei? <button type="button" class="lnk" id="toForm">Neue Meldung erstellen</button></div>
+  </div>
+
+  <form id="form" class="card hidden" autocomplete="off">
+    <div id="err" class="err"></div>
+
+    <label for="kat">Kategorie</label>
+    <select id="kat" required></select>
+
+    <div id="objWrap" class="hidden">
+      <label for="obj">Betroffenes Objekt <span class="opt">(Fahrzeug, Gerät, Raum …)</span></label>
+      <select id="obj"></select>
+    </div>
+    <div id="objFreeWrap" class="hidden">
+      <label for="objFree" id="objFreeLbl">Bitte angeben</label>
+      <input type="text" id="objFree" maxlength="120">
+    </div>
+
+    <div id="dupe" class="dupe hidden"></div>
+
+    <label for="betreff">Betreff</label>
+    <input type="text" id="betreff" maxlength="120" placeholder="Kurz in einem Satz" required>
+
+    <label for="text">Beschreibung</label>
+    <textarea id="text" maxlength="4000" placeholder="Was ist das Problem? Seit wann? Was wurde schon versucht?" required></textarea>
+
+    <label>Priorität</label>
+    <div class="seg" id="prio"></div>
+    <div class="hint">„Dringend“ bitte nur bei Gefahr oder Ausfall einsatzrelevanter Technik.</div>
+
+    <label>Fotos <span class="opt">(optional)</span></label>
+    <label class="addph" for="file" id="addLbl">📷 Foto hinzufügen</label>
+    <input type="file" id="file" accept="image/*" multiple class="hidden">
+    <div class="thumbs" id="thumbs"></div>
+
+    <label for="name">Dein Name</label>
+    <input type="text" id="name" maxlength="80" autocomplete="name" required>
+
+    <label for="mail">E-Mail <span class="opt">(optional – für Bestätigung und Rückmeldungen)</span></label>
+    <input type="email" id="mail" maxlength="120" autocomplete="email">
+
+    <div class="hp" aria-hidden="true"><label>Website <input type="text" id="website" tabindex="-1" autocomplete="off"></label></div>
+
+    <div style="margin-top:20px"><button type="submit" class="btn" id="send">Ticket absenden</button></div>
+  </form>
+
+  <div id="done" class="card done hidden">
+    <div class="ok">✅</div>
+    <div>Danke, dein Ticket wurde angelegt.</div>
+    <div class="nr" id="doneNr"></div>
+    <div class="hint">Bitte merke dir die Nummer für Rückfragen.</div>
+    <button class="btn sec" id="again" type="button">Weiteres Ticket melden</button>
+  </div>
+</main>
+<footer><a href="admin.html" target="_top">Verwaltung</a></footer>
+
+<script src="config.js"></script>
+<script src="api.js"></script>
+<script>
+(function () {
+  var CFG = null, photos = [];
+  var $ = function (id) { return document.getElementById(id); };
+
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+
+  var PUB = { enabled: false, tickets: [] }, pending = 2;
+  function ready() { if (--pending === 0) start(); }
+
+  API.run.withSuccessHandler(function (cfg) { CFG = cfg; ready(); }).withFailureHandler(function (e) {
+    $('loading').textContent = 'Fehler beim Laden: ' + (e && e.message ? e.message : e);
+  }).getFormData();
+
+  API.run.withSuccessHandler(function (r) { PUB = r || PUB; ready(); })
+    .withFailureHandler(function () { ready(); }).getPublicTickets();
+
+  function start() {
+    var cfg = CFG;
+    $('loading').classList.add('hidden');
+
+    var kat = $('kat');
+    kat.innerHTML = '<option value="">Bitte wählen …</option>';
+    cfg.kategorien.forEach(function (k) { var o = document.createElement('option'); o.value = o.textContent = k; kat.appendChild(o); });
+
+    var pr = $('prio');
+    cfg.prioritaeten.forEach(function (p, i) {
+      var id = 'p' + i;
+      var inp = document.createElement('input'); inp.type = 'radio'; inp.name = 'prio'; inp.id = id; inp.value = p;
+      if (p === 'Normal' || (i === 0 && cfg.prioritaeten.indexOf('Normal') < 0)) inp.checked = true;
+      var lb = document.createElement('label'); lb.htmlFor = id; lb.textContent = p;
+      pr.appendChild(inp); pr.appendChild(lb);
+    });
+
+    if (cfg.maxFotos < 1) { $('addLbl').classList.add('hidden'); }
+    var n = store('tk_name'), m = store('tk_mail');
+    if (n) $('name').value = n;
+    if (m) $('mail').value = m;
+
+    // Ansicht wählen: bei vorhandener Liste zuerst die offenen Meldungen zeigen (Doppelmeldungen vermeiden)
+    var hasList = PUB.enabled;
+    $('tabs').classList.toggle('hidden', !hasList);
+    if (hasList) {
+      fillListFilter();
+      renderList();
+      show(openCount() > 0 ? 'list' : 'form');
+    } else {
+      show('form');
+    }
+  }
+
+  // ---------- Ansichten / Liste ----------
+  function show(which) {
+    var list = which === 'list';
+    $('listView').classList.toggle('hidden', !list);
+    $('form').classList.toggle('hidden', list);
+    $('done').classList.add('hidden');
+    $('tabList').classList.toggle('on', list);
+    $('tabForm').classList.toggle('on', !list);
+    window.scrollTo(0, 0);
+  }
+  $('tabForm').onclick = function () { show('form'); };
+  $('tabList').onclick = function () { show('list'); };
+  $('toForm').onclick = function () { show('form'); };
+
+  function esc(v) { var d = document.createElement('div'); d.textContent = v == null ? '' : String(v); return d.innerHTML; }
+  function openCount() { return PUB.tickets.filter(function (t) { return !t.closed; }).length; }
+
+  function prioCls(t) {
+    var n = CFG.prioritaeten.length;
+    return n > 2 && t.prioRank >= n - 1 ? 'pd' : (n > 2 && t.prioRank >= n - 2 ? 'p2' : '');
+  }
+  function mtGet() { try { return JSON.parse(store('tk_mt') || '{}'); } catch (e) { return {}; } }
+  function mtSet(nr) { var m = mtGet(); m[nr] = 1; store('tk_mt', JSON.stringify(m)); }
+
+  function ticketHtml(t) {
+    var mt = '';
+    if (!t.closed) {
+      mt = '<div class="mtw" data-nr="' + esc(t.nr) + '">' +
+        (mtGet()[t.nr] ? '<span class="mt">✔ Du bist eingetragen</span>' : '<button type="button" class="lnk mtb">👥 Betrifft mich auch</button>') +
+        (t.betroffen ? ' <span class="mt">· ' + t.betroffen + ' weitere betroffen</span>' : '') + '</div>';
+    }
+    return '<div class="tk' + (t.closed ? ' closed' : '') + '"><div class="r1"><span class="nr">' + esc(t.nr) + '</span><span class="mt">' + esc(t.erstellt) + '</span></div>' +
+      '<div class="tt">' + esc(t.betreff) + '</div>' +
+      '<div class="mt">' + esc(t.kategorie) + (t.objekt ? ' · ' + esc(t.objekt) : '') + '</div>' +
+      '<div class="bd"><span class="b ' + prioCls(t) + '">' + esc(t.prioritaet) + '</span><span class="b st">' + esc(t.status) + '</span></div>' + mt + '</div>';
+  }
+
+  // ---------- „Betrifft mich auch“ ----------
+  function refreshViews() { renderList(); checkDupes(); }
+  document.addEventListener('click', function (e) {
+    var el = e.target;
+    if (!el || !el.closest) return;
+    var b = el.closest('.mtb');
+    if (b) {
+      var w = b.parentNode;
+      w.innerHTML = '<div class="mtf"><input type="text" class="mtn" maxlength="80" placeholder="Dein Name" value="' + esc(store('tk_name') || '').replace(/"/g, '&quot;') + '">' +
+        '<input type="text" class="mtt" maxlength="300" placeholder="Anmerkung (optional), z. B. seit wann">' +
+        '<div class="mta"><button type="button" class="mbtn mts">Eintragen</button><button type="button" class="mbtn sec mtc">Abbrechen</button></div><div class="mte"></div></div>';
+      var ni = w.querySelector('.mtn'); if (!ni.value) ni.focus(); else w.querySelector('.mtt').focus();
+      return;
+    }
+    if (el.closest('.mtc')) { refreshViews(); return; }
+    var sbtn = el.closest('.mts');
+    if (sbtn) {
+      var wrap = sbtn.closest('.mtw'), nr = wrap.getAttribute('data-nr');
+      var name = wrap.querySelector('.mtn').value.trim(), note = wrap.querySelector('.mtt').value.trim();
+      var err = wrap.querySelector('.mte');
+      if (name.length < 2) { err.textContent = 'Bitte deinen Namen eingeben.'; return; }
+      sbtn.disabled = true; sbtn.textContent = 'Wird eingetragen …'; err.textContent = '';
+      API.run.withSuccessHandler(function (r) {
+        store('tk_name', name); mtSet(nr);
+        for (var i = 0; i < PUB.tickets.length; i++) if (PUB.tickets[i].nr === nr) PUB.tickets[i].betroffen = (r && r.anzahl) || ((PUB.tickets[i].betroffen || 0) + 1);
+        refreshViews();
+      }).withFailureHandler(function (er) {
+        sbtn.disabled = false; sbtn.textContent = 'Eintragen';
+        err.textContent = er && er.message ? er.message : 'Eintragen fehlgeschlagen.';
+      }).meToo({ nr: nr, name: name, note: note, website: '' });
+    }
+  });
+
+  function fillListFilter() {
+    var sel = $('lfKat'); sel.innerHTML = '<option value="">Alle Kategorien</option>';
+    CFG.kategorien.forEach(function (k) { var o = document.createElement('option'); o.value = o.textContent = k; sel.appendChild(o); });
+    sel.onchange = renderList;
+  }
+
+  function renderList() {
+    var k = $('lfKat').value;
+    var all = PUB.tickets.filter(function (t) { return !k || t.kategorie === k; });
+    var open = all.filter(function (t) { return !t.closed; }), closed = all.filter(function (t) { return t.closed; });
+    $('cnt').textContent = openCount();
+    $('listOpen').innerHTML = open.length ? open.map(ticketHtml).join('') : '<div class="empty">Keine offenen Meldungen. 👍</div>';
+    $('listClosed').innerHTML = closed.map(ticketHtml).join('');
+    $('listClosedWrap').classList.toggle('hidden', !closed.length);
+  }
+
+  // ---------- Hinweis auf ähnliche offene Meldungen ----------
+  function words(txt) {
+    return String(txt || '').toLowerCase().split(/[^a-zäöüß0-9]+/).filter(function (w) { return w.length >= 4; });
+  }
+  var dupeTimer = null;
+  function checkDupes() {
+    clearTimeout(dupeTimer);
+    dupeTimer = setTimeout(function () {
+      var box = $('dupe');
+      var kat = $('kat').value;
+      if (!PUB.enabled || !kat) { box.classList.add('hidden'); return; }
+      var objSel = $('obj').value;
+      var obj = (objSel && objSel !== 'Sonstiges') ? objSel : '';
+      var ws = words($('betreff').value);
+      var hits = PUB.tickets.filter(function (t) {
+        if (t.closed || t.kategorie !== kat) return false;
+        if (obj && t.objekt === obj) return true;
+        if (!ws.length) return false;
+        var tw = words(t.betreff + ' ' + t.objekt);
+        return ws.some(function (w) { return tw.indexOf(w) >= 0; });
+      }).slice(0, 4);
+      if (!hits.length) { box.classList.add('hidden'); return; }
+      box.innerHTML = '<b>Dazu gibt es schon offene Meldungen – bitte nicht doppelt melden:</b>' + hits.map(ticketHtml).join('');
+      box.classList.remove('hidden');
+    }, 250);
+  }
+  $('betreff').addEventListener('input', checkDupes);
+
+  $('kat').addEventListener('change', function () {
+    checkDupes();
+    var list = (CFG.objekte[this.value] || []);
+    var sel = $('obj');
+    sel.innerHTML = '';
+    $('objFree').value = '';
+    if (!this.value) { $('objWrap').classList.add('hidden'); $('objFreeWrap').classList.add('hidden'); return; }
+    if (!list.length) {
+      $('objWrap').classList.add('hidden');
+      $('objFreeLbl').textContent = 'Betroffenes Objekt (optional)';
+      $('objFreeWrap').classList.remove('hidden');
+      return;
+    }
+    var first = document.createElement('option'); first.value = ''; first.textContent = 'Bitte wählen …'; sel.appendChild(first);
+    list.concat(['Sonstiges']).forEach(function (o) { var op = document.createElement('option'); op.value = op.textContent = o; sel.appendChild(op); });
+    $('objWrap').classList.remove('hidden');
+    $('objFreeWrap').classList.add('hidden');
+  });
+
+  $('obj').addEventListener('change', function () {
+    checkDupes();
+    var other = this.value === 'Sonstiges';
+    $('objFreeLbl').textContent = 'Bitte angeben, was betroffen ist';
+    $('objFreeWrap').classList.toggle('hidden', !other);
+    if (!other) $('objFree').value = '';
+  });
+
+  // Fotos verkleinern (max. 1600 px, JPEG) – spart Datenvolumen und Platz
+  $('file').addEventListener('change', function () {
+    var files = Array.prototype.slice.call(this.files || []);
+    this.value = '';
+    files.forEach(function (f) {
+      if (photos.length >= CFG.maxFotos) return;
+      var img = new Image(), url = URL.createObjectURL(f);
+      img.onload = function () {
+        var max = 1600, w = img.width, h = img.height, k = Math.min(1, max / Math.max(w, h));
+        var c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        var data = c.toDataURL('image/jpeg', 0.8);
+        URL.revokeObjectURL(url);
+        if (photos.length >= CFG.maxFotos) return;
+        photos.push({ name: f.name, mime: 'image/jpeg', data: data.split(',')[1], preview: data });
+        renderThumbs();
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); showErr('Das Foto „' + f.name + '“ konnte nicht gelesen werden (bitte JPG oder PNG verwenden).'); };
+      img.src = url;
+    });
+  });
+
+  function renderThumbs() {
+    var t = $('thumbs'); t.innerHTML = '';
+    photos.forEach(function (p, i) {
+      var d = document.createElement('div'); d.className = 'th';
+      var im = document.createElement('img'); im.src = p.preview; d.appendChild(im);
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = '×'; b.setAttribute('aria-label', 'Foto entfernen');
+      b.onclick = function () { photos.splice(i, 1); renderThumbs(); };
+      d.appendChild(b); t.appendChild(d);
+    });
+    $('addLbl').classList.toggle('hidden', photos.length >= CFG.maxFotos);
+  }
+
+  function showErr(msg) { var e = $('err'); e.textContent = msg; e.style.display = msg ? 'block' : 'none'; if (msg) e.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+
+  $('form').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    showErr('');
+    var objekt = '';
+    if (!$('objWrap').classList.contains('hidden')) {
+      objekt = $('obj').value;
+      if (!objekt) { showErr('Bitte das betroffene Objekt wählen.'); return; }
+      if (objekt === 'Sonstiges') {
+        var fr = $('objFree').value.trim();
+        if (!fr) { showErr('Bitte angeben, was betroffen ist.'); return; }
+        objekt = 'Sonstiges: ' + fr;
+      }
+    } else {
+      objekt = $('objFree').value.trim();
+    }
+    var prio = document.querySelector('input[name=prio]:checked');
+    var payload = {
+      kategorie: $('kat').value, objekt: objekt, betreff: $('betreff').value, beschreibung: $('text').value,
+      prioritaet: prio ? prio.value : '', ersteller: $('name').value, mail: $('mail').value, website: $('website').value,
+      fotos: photos.map(function (p) { return { name: p.name, mime: p.mime, data: p.data }; })
+    };
+    var btn = $('send'); btn.disabled = true; btn.textContent = 'Wird gesendet …';
+    API.run.withSuccessHandler(function (res) {
+      store('tk_name', payload.ersteller); store('tk_mail', payload.mail);
+      $('form').classList.add('hidden');
+      $('doneNr').textContent = res.nr;
+      $('done').classList.remove('hidden');
+      window.scrollTo(0, 0);
+      if (PUB.enabled) API.run.withSuccessHandler(function (r) { PUB = r || PUB; renderList(); }).getPublicTickets();
+    }).withFailureHandler(function (e) {
+      btn.disabled = false; btn.textContent = 'Ticket absenden';
+      showErr(e && e.message ? e.message : 'Senden fehlgeschlagen. Bitte erneut versuchen.');
+    }).submitTicket(payload);
+  });
+
+  $('again').addEventListener('click', function () {
+    photos = []; renderThumbs();
+    ['kat', 'betreff', 'text', 'objFree'].forEach(function (id) { $(id).value = ''; });
+    $('objWrap').classList.add('hidden'); $('objFreeWrap').classList.add('hidden');
+    var b = $('send'); b.disabled = false; b.textContent = 'Ticket absenden';
+    $('dupe').classList.add('hidden');
+    $('done').classList.add('hidden'); $('form').classList.remove('hidden');
+  });
+})();
+</script>
+</body>
+</html>
